@@ -1943,7 +1943,7 @@ function ViewMenu({
       {open && (
         <div
           role="menu"
-          className="absolute left-1/2 top-[34px] w-[200px] -translate-x-1/2 overflow-hidden rounded-[10px] border border-white/[0.08] bg-[#070b14]/95 py-1 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.95)] backdrop-blur-xl"
+          className="absolute right-0 top-[40px] w-[200px] overflow-hidden rounded-[10px] border border-white/[0.08] bg-[#070b14]/95 py-1 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.95)] backdrop-blur-xl"
         >
           {CAMERA_PRESETS.map((p) => (
             <button
