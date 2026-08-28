@@ -425,6 +425,99 @@ function DashedLine({
 }
 
 /**
+ * Opportunistic pass: any LEO that flies over a receiver without a designed
+ * segment still transmits a straight line-of-sight beam while overhead.
+ */
+function PassBeam({ satId, rxId, live }: { satId: string; rxId: string; live: LiveMap }) {
+  const N = 2;
+  const core = useRef<THREE.Line>(null);
+  const packs = useRef<THREE.Group>(null);
+  const vis = useRef(0);
+  const flow = useRef(Math.random());
+
+  const geometry = useMemo(() => {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array((N + 1) * 3), 3));
+    g.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 4);
+    return g;
+  }, []);
+
+  const scratch = useMemo(
+    () => ({ a: new THREE.Vector3(), b: new THREE.Vector3(), p: new THREE.Vector3() }),
+    []
+  );
+
+  useFrame((_, d) => {
+    const from = live.get(satId);
+    const to = live.get(rxId);
+    if (!from || !to) return;
+    const { a, b, p } = scratch;
+    a.copy(from);
+    b.copy(to);
+
+    const target = windowScore(a, b) > 0.2 ? 1 : 0;
+    vis.current += (target - vis.current) * Math.min(1, d * 1.8);
+    flow.current = (flow.current + d * 0.5) % 1;
+
+    const attr = geometry.getAttribute('position') as THREE.BufferAttribute;
+    const arr = attr.array as Float32Array;
+    for (let i = 0; i <= N; i++) {
+      p.copy(a).lerp(b, i / N);
+      arr[i * 3] = p.x;
+      arr[i * 3 + 1] = p.y;
+      arr[i * 3 + 2] = p.z;
+    }
+    attr.needsUpdate = true;
+
+    const v = vis.current;
+    if (core.current) {
+      const m = core.current.material as THREE.LineBasicMaterial;
+      m.opacity = v * 0.6;
+      core.current.visible = v > 0.01;
+    }
+    if (packs.current) {
+      packs.current.visible = v > 0.05;
+      packs.current.children.forEach((child, i) => {
+        const t = (flow.current + i / packs.current!.children.length) % 1;
+        child.position.copy(p.copy(a).lerp(b, t));
+        const mat = (child as THREE.Mesh).material as THREE.MeshBasicMaterial;
+        mat.opacity = v * (0.4 + 0.6 * Math.sin(t * Math.PI)) * 0.85;
+      });
+    }
+  });
+
+  return (
+    <group>
+      {/* @ts-expect-error three line primitive */}
+      <line ref={core} geometry={geometry}>
+        <lineBasicMaterial
+          color={CYAN}
+          transparent
+          opacity={0}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </line>
+      <group ref={packs}>
+        {[0, 1, 2].map((i) => (
+          <mesh key={i}>
+            <sphereGeometry args={[0.004, 8, 8]} />
+            <meshBasicMaterial
+              color="#f0f9ff"
+              transparent
+              opacity={0}
+              depthWrite={false}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+        ))}
+      </group>
+    </group>
+  );
+}
+
+
+/**
  * Live satellite downlink: geometry is re-sampled every frame from the moving
  * satellite, and the optical beam only exists inside a communication window.
  */
