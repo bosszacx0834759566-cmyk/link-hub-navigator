@@ -447,7 +447,7 @@ function DownlinkBeam({
   const meta = TECH_META[link.segment.tech];
   const blocked = link.status === 'UNAVAILABLE';
   const degraded = link.status === 'DEGRADED';
-  const active = inWindow && !blocked;
+  
 
   const core = useRef<THREE.Line>(null);
   const sheath = useRef<THREE.Line>(null);
