@@ -479,39 +479,30 @@ function DownlinkBeam({
     const to = live.get(link.segment.to);
     if (!from || !to) return;
 
-    const target = active ? 1 : 0;
-    vis.current += (target - vis.current) * Math.min(1, d * 1.8);
-    flow.current = (flow.current + d * 0.5) % 1;
-
-    const { a, b, mid, p, q } = scratch;
+    const { a, b, p, q } = scratch;
     a.copy(from);
     b.copy(to);
-    mid.copy(a).add(b).multiplyScalar(0.5);
-    mid.setLength(Math.max(a.length(), b.length()) * (1 + a.distanceTo(b) * 0.03));
+
+    // any LEO that is actually passing over the receiver transmits — not just
+    // the single best-scoring satellite
+    const pass = windowScore(a, b) > 0.16;
+    const target = !blocked && (pass || inWindow) ? 1 : 0;
+    vis.current += (target - vis.current) * Math.min(1, d * 1.8);
+    flow.current = (flow.current + d * 0.5) % 1;
 
     const attr = geometry.getAttribute('position') as THREE.BufferAttribute;
     const arr = attr.array as Float32Array;
     for (let i = 0; i <= N; i++) {
       const t = i / N;
-      const inv = 1 - t;
-      p.copy(a)
-        .multiplyScalar(inv * inv)
-        .addScaledVector(mid, 2 * inv * t)
-        .addScaledVector(b, t * t);
+      // straight line-of-sight beam
+      p.copy(a).lerp(b, t);
       arr[i * 3] = p.x;
       arr[i * 3 + 1] = p.y;
       arr[i * 3 + 2] = p.z;
     }
     attr.needsUpdate = true;
 
-    const bezier = (t: number, out: THREE.Vector3) => {
-      const inv = 1 - t;
-      return out
-        .copy(a)
-        .multiplyScalar(inv * inv)
-        .addScaledVector(mid, 2 * inv * t)
-        .addScaledVector(b, t * t);
-    };
+    const bezier = (t: number, out: THREE.Vector3) => out.copy(a).lerp(b, t);
 
     const boost = highlighted || selected ? 1.3 : 1;
     const v = vis.current;
