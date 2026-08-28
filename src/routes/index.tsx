@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { lazy, Suspense } from 'react';
 
 import { useOloLink } from '@/hooks/use-ololink';
-import { Rail } from '@/components/ololink/rail';
+import { TopNav } from '@/components/ololink/top-nav';
 import { ContextPanel } from '@/components/ololink/context-panel';
 import { ObjectCard } from '@/components/ololink/object-card';
 import { Dock } from '@/components/ololink/dock';
@@ -55,8 +55,8 @@ function Explorer() {
       </div>
 
 
-      {/* LEVEL 2 — navigation rail */}
-      <Rail
+      {/* LEVEL 2 — top navigation */}
+      <TopNav
         active={state.panel}
         onToggle={state.togglePanel}
         alertCount={state.profile.alerts.length}
