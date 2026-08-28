@@ -1990,6 +1990,11 @@ export function GlobeScene({ state }: { state: OloLinkState }) {
   const onLod = useMemo(() => (s: LodState) => setLod(s), []);
   const [preset, setPreset] = useState<PresetId | null>(null);
   const [presetSeq, setPresetSeq] = useState(0);
+  const [menuSlot, setMenuSlot] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setMenuSlot(document.getElementById('ololink-view-menu-slot'));
+  }, []);
 
   const goTo = (id: PresetId) => {
     setPreset(id);
@@ -2018,14 +2023,17 @@ export function GlobeScene({ state }: { state: OloLinkState }) {
         </LodContext.Provider>
       </Canvas>
 
-      {/* single compact camera control — everything else lives in its dropdown */}
-      <div className="absolute left-1/2 top-[92px] z-20 -translate-x-1/2">
-        <ViewMenu
-          preset={preset}
-          onSelect={goTo}
-          tier={`${LOD_LABEL[lod.level]}${lod.region ? ` · ${REGION_BY_ID[lod.region]?.short}` : ''}`}
-        />
-      </div>
+      {/* single compact camera control — rendered into the top navigation bar */}
+      {menuSlot &&
+        createPortal(
+          <ViewMenu
+            preset={preset}
+            onSelect={goTo}
+            tier={`${LOD_LABEL[lod.level]}${lod.region ? ` · ${REGION_BY_ID[lod.region]?.short}` : ''}`}
+          />,
+          menuSlot
+        )}
+
 
     </LabelLayer>
   );
