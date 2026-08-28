@@ -83,6 +83,9 @@ export function TopNav({
         ))}
       </div>
 
+      {/* camera view menu — mounted here by GlobeScene via portal */}
+      <div id="ololink-view-menu-slot" className="flex shrink-0 items-center" />
+
       <span className="hidden h-5 w-px shrink-0 bg-white/[0.08] md:block" />
 
       {/* settings */}
