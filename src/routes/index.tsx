@@ -75,7 +75,7 @@ function Explorer() {
       {!state.selection && !state.panel && (
         <div className="pointer-events-none absolute bottom-[74px] left-1/2 z-20 -translate-x-1/2 text-center">
           <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground/40">
-            Drag to orbit · select an asset or link to inspect · hover the rail for workspaces
+            Drag to orbit · select an asset or link to inspect · use the top bar for workspaces
           </p>
         </div>
       )}
