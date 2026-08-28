@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { lazy, Suspense } from 'react';
 
 import { useOloLink } from '@/hooks/use-ololink';
-import { Rail } from '@/components/ololink/rail';
+import { TopNav } from '@/components/ololink/top-nav';
 import { ContextPanel } from '@/components/ololink/context-panel';
 import { ObjectCard } from '@/components/ololink/object-card';
 import { Dock } from '@/components/ololink/dock';
@@ -55,8 +55,8 @@ function Explorer() {
       </div>
 
 
-      {/* LEVEL 2 — navigation rail */}
-      <Rail
+      {/* LEVEL 2 — top navigation */}
+      <TopNav
         active={state.panel}
         onToggle={state.togglePanel}
         alertCount={state.profile.alerts.length}
@@ -75,7 +75,7 @@ function Explorer() {
       {!state.selection && !state.panel && (
         <div className="pointer-events-none absolute bottom-[74px] left-1/2 z-20 -translate-x-1/2 text-center">
           <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground/40">
-            Drag to orbit · select an asset or link to inspect · hover the rail for workspaces
+            Drag to orbit · select an asset or link to inspect · use the top bar for workspaces
           </p>
         </div>
       )}
