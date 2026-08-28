@@ -1,6 +1,7 @@
 'use client';
 
 import { Canvas, useFrame, useLoader, type ThreeEvent } from '@react-three/fiber';
+import { createPortal } from 'react-dom';
 import { Html, OrbitControls, Stars } from '@react-three/drei';
 import {
   createContext,
